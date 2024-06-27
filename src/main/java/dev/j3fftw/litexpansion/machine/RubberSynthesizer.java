@@ -62,7 +62,7 @@ public class RubberSynthesizer extends AContainer implements RecipeDisplayItem, 
     @Nonnull
     @Override
     public String getInventoryTitle() {
-        return "&6橡胶合成机";
+        return "&6Rubber Synthesizer";
     }
 
     @Nonnull

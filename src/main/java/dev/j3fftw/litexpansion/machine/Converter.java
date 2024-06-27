@@ -58,7 +58,7 @@ public class Converter extends AContainer implements PoweredMachine {
     @Nonnull
     @Override
     public String getInventoryTitle() {
-        return "&6转换机";
+        return "&6Converter";
     }
 
     @Nonnull

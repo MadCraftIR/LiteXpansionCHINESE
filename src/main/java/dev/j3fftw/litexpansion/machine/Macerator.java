@@ -79,7 +79,7 @@ public class Macerator extends AContainer implements PoweredMachine, RecipeDispl
     @Nonnull
     @Override
     public String getInventoryTitle() {
-        return "&6粉碎机";
+        return "&6Macerator";
     }
 
     @Nonnull

@@ -44,7 +44,7 @@ public class MassFabricator extends SlimefunItem implements InventoryBlock, Ener
 
     private static final Map<BlockPosition, Integer> progress = new HashMap<>();
 
-    private static final CustomItemStack progressItem = new CustomItemStack(Items.UU_MATTER.getType(), "&7进度");
+    private static final CustomItemStack progressItem = new CustomItemStack(Items.UU_MATTER.getType(), "&7Progress");
 
     private static final ItemStack plate = SlimefunItems.REINFORCED_PLATE;
     private static final ItemStack circuitBoard = SlimefunItems.ADVANCED_CIRCUIT_BOARD;
@@ -71,7 +71,7 @@ public class MassFabricator extends SlimefunItem implements InventoryBlock, Ener
     }
 
     private void setupInv() {
-        createPreset(this, "&5物质生成机", blockMenuPreset -> {
+        createPreset(this, "&5Mass Fabricator", blockMenuPreset -> {
             for (int i = 0; i < 27; i++) {
                 if (i == INPUT_SLOTS[0] || i == INPUT_SLOTS[1]) continue;
                 blockMenuPreset.addItem(i, ChestMenuUtils.getBackground(), ChestMenuUtils.getEmptyClickHandler());

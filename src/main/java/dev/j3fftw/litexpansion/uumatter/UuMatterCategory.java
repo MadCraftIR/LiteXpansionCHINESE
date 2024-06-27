@@ -30,9 +30,9 @@ public final class UuMatterCategory extends FlexItemGroup {
 
     private UuMatterCategory() {
         super(new NamespacedKey(LiteXpansion.getInstance(), "uumatter_category"),
-            new CustomItemStack(PlayerHead.getItemStack(PlayerSkin.fromHashCode(
-                "54d39df0f813b7424406462854eb7249f8c76d80ce56f3af410e35a287062589")),
-                "&5UU 物质合成表")
+                new CustomItemStack(PlayerHead.getItemStack(PlayerSkin.fromHashCode(
+                        "54d39df0f813b7424406462854eb7249f8c76d80ce56f3af410e35a287062589")),
+                        "&5UU-Matter Recipes")
         );
     }
 
@@ -111,7 +111,7 @@ public final class UuMatterCategory extends FlexItemGroup {
 
     @Override
     public void open(Player player, PlayerProfile playerProfile, SlimefunGuideMode slimefunGuideLayout) {
-        ChestMenu menu = new ChestMenu("&5UU 物质合成表");
+        ChestMenu menu = new ChestMenu("&5UU-Matter Recipes");
 
         // Header
         for (int i = 0; i < 9; ++i) {

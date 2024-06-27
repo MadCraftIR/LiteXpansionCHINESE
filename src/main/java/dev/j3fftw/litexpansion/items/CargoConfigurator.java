@@ -1,9 +1,5 @@
 package dev.j3fftw.litexpansion.items;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
-import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import dev.j3fftw.litexpansion.Items;
 import dev.j3fftw.litexpansion.LiteXpansion;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
@@ -14,6 +10,7 @@ import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
 import io.github.thebusybiscuit.slimefun4.implementation.items.SimpleSlimefunItem;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.data.persistent.PersistentDataAPI;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
+import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -32,20 +29,17 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class CargoConfigurator extends SimpleSlimefunItem<ItemUseHandler> implements Listener {
-
-    private static final Gson GSON = new Gson();
 
     private static final NamespacedKey CARGO_BLOCK = new NamespacedKey(LiteXpansion.getInstance(), "cargo_block");
     private static final NamespacedKey CARGO_CONFIG = new NamespacedKey(LiteXpansion.getInstance(), "cargo_config");
 
     public CargoConfigurator() {
         super(Items.LITEXPANSION, Items.CARGO_CONFIGURATOR, RecipeType.ENHANCED_CRAFTING_TABLE, new ItemStack[] {
-            Items.REFINED_IRON, SlimefunItems.REINFORCED_PLATE, Items.REFINED_IRON,
-            SlimefunItems.REINFORCED_PLATE, SlimefunItems.CARGO_MANAGER, SlimefunItems.REINFORCED_PLATE,
-            Items.REFINED_IRON, SlimefunItems.REINFORCED_PLATE, Items.REFINED_IRON
+                Items.REFINED_IRON, SlimefunItems.REINFORCED_PLATE, Items.REFINED_IRON,
+                SlimefunItems.REINFORCED_PLATE, SlimefunItems.CARGO_MANAGER, SlimefunItems.REINFORCED_PLATE,
+                Items.REFINED_IRON, SlimefunItems.REINFORCED_PLATE, Items.REFINED_IRON
         });
 
         Bukkit.getPluginManager().registerEvents(this, LiteXpansion.getInstance());
@@ -76,12 +70,12 @@ public class CargoConfigurator extends SimpleSlimefunItem<ItemUseHandler> implem
         final ItemMeta meta = clickedItem.getItemMeta();
 
         final List<String> defaultLore = Items.CARGO_CONFIGURATOR.getItemMetaSnapshot().getLore()
-            .orElse(new ArrayList<>());
+                .orElse(new ArrayList<>());
         final List<String> lore = meta.hasLore() ? meta.getLore() : defaultLore;
 
         // Clear the config and lore
         if ((e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK)
-            && e.getPlayer().isSneaking()
+                && e.getPlayer().isSneaking()
         ) {
             clearConfig(e.getPlayer(), clickedItem, meta, defaultLore, lore);
             e.setCancelled(true);
@@ -89,11 +83,11 @@ public class CargoConfigurator extends SimpleSlimefunItem<ItemUseHandler> implem
         }
 
         if ((e.getAction() != Action.RIGHT_CLICK_BLOCK && e.getAction() != Action.LEFT_CLICK_BLOCK)
-            || e.getClickedBlock() == null) {
+                || e.getClickedBlock() == null) {
             return;
         }
 
-        final SlimefunItem block = StorageCacheUtils.getSfItem(e.getClickedBlock().getLocation());
+        final SlimefunItem block = BlockStorage.check(e.getClickedBlock());
         if (block == null) {
             return;
         }
@@ -102,8 +96,8 @@ public class CargoConfigurator extends SimpleSlimefunItem<ItemUseHandler> implem
 
         final String blockId = block.getId();
         if (!blockId.equals(SlimefunItems.CARGO_INPUT_NODE.getItemId())
-            && !blockId.equals(SlimefunItems.CARGO_OUTPUT_NODE.getItemId())
-            && !blockId.equals(SlimefunItems.CARGO_OUTPUT_NODE_2.getItemId())
+                && !blockId.equals(SlimefunItems.CARGO_OUTPUT_NODE.getItemId())
+                && !blockId.equals(SlimefunItems.CARGO_OUTPUT_NODE_2.getItemId())
         ) {
             return;
         }
@@ -128,7 +122,7 @@ public class CargoConfigurator extends SimpleSlimefunItem<ItemUseHandler> implem
     ) {
         PersistentDataAPI.remove(meta, CARGO_BLOCK);
         PersistentDataAPI.remove(meta, CARGO_CONFIG);
-        player.sendMessage(ChatColor.RED + "已清除货运节点的配置!");
+        player.sendMessage(ChatColor.RED + "Cleared node configuration!");
 
         if (lore.size() != defaultLore.size()) {
             lore.clear();
@@ -146,40 +140,32 @@ public class CargoConfigurator extends SimpleSlimefunItem<ItemUseHandler> implem
             final String copiedBlock = PersistentDataAPI.getString(meta, CARGO_BLOCK);
             final String config = PersistentDataAPI.getString(meta, CARGO_CONFIG);
             if (copiedBlock == null || config == null) {
-                e.getPlayer().sendMessage(ChatColor.RED + "你必须先复制一个节点的配置!");
+                e.getPlayer().sendMessage(ChatColor.RED + "You do not have a config copied!");
                 return;
             }
 
             if (!copiedBlock.equals(blockId)) {
-                e.getPlayer().sendMessage(ChatColor.RED + "你不能复制配置到这个节点上!");
+                e.getPlayer().sendMessage(ChatColor.RED + "You can't apply the config to this node!");
                 return;
             }
 
-            SlimefunBlockData blockData = StorageCacheUtils.getBlock(e.getClickedBlock().getLocation());
-            StorageCacheUtils.executeAfterLoad(blockData, () -> {
-                Map<String, String> map = GSON.fromJson(config, new TypeToken<Map<String, String>>() {}.getType());
-                for (Map.Entry<String, String> entry : map.entrySet()) {
-                    blockData.setData(entry.getKey(), entry.getValue());
-                }
-                e.getPlayer().sendMessage(ChatColor.GREEN + "已应用配置!");
-            }, false);
+            BlockStorage.setBlockInfo(e.getClickedBlock(), config, true);
+            BlockStorage.getStorage(e.getClickedBlock().getWorld()).reloadInventory(e.getClickedBlock().getLocation());
+            e.getPlayer().sendMessage(ChatColor.GREEN + "Applied configuration!");
         } else if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            SlimefunBlockData blockData = StorageCacheUtils.getBlock(e.getClickedBlock().getLocation());
-            StorageCacheUtils.executeAfterLoad(blockData, () -> {
-                PersistentDataAPI.setString(meta, CARGO_BLOCK, blockId);
-                PersistentDataAPI.setString(meta, CARGO_CONFIG, GSON.toJson(blockData.getAllData()));
+            PersistentDataAPI.setString(meta, CARGO_BLOCK, blockId);
+            PersistentDataAPI.setString(meta, CARGO_CONFIG, BlockStorage.getBlockInfoAsJson(e.getClickedBlock()));
 
-                // Has the copied part
-                if (lore.size() == defaultLore.size() + 2) {
-                    lore.clear();
-                    lore.addAll(defaultLore);
-                }
-                lore.addAll(Arrays.asList("", ChatColor.GRAY + "> 物品 "
+            // Has the copied part
+            if (lore.size() == defaultLore.size() + 2) {
+                lore.clear();
+                lore.addAll(defaultLore);
+            }
+            lore.addAll(Arrays.asList("", ChatColor.GRAY + "> Copied "
                     + ChatColor.RESET + clickedItemStack.getItemMeta().getDisplayName()
-                    + ChatColor.GRAY + " 的配置"
-                ));
-                e.getPlayer().sendMessage(ChatColor.GREEN + "成功复制节点配置!");
-            }, false);
+                    + ChatColor.GRAY + " config!"
+            ));
+            e.getPlayer().sendMessage(ChatColor.GREEN + "Copied node configuration!");
         }
     }
 }

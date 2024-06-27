@@ -238,7 +238,7 @@ final class ItemSetup {
 
     private void registerEndgameItems() {
         registerNonPlaceableItem(Items.SCRAP, Recycler.RECIPE_TYPE, new CustomItemStack(Material.COBBLESTONE,
-            "&7任何物品!"));
+                "&7Any Item!"));
         new DyeItem(Items.LITEXPANSION, Items.UU_MATTER, MassFabricator.RECIPE_TYPE,
             createSingleItemRecipeCentered(Items.SCRAP)).register(plugin);
         new DyeItem(Items.LITEXPANSION, Items.IRIDIUM, RecipeType.ENHANCED_CRAFTING_TABLE, new ItemStack[] {
